@@ -18,6 +18,10 @@
 - Selected experiences + detail pages now load live from the Koodh CMS (clr.koodh.com) through backend proxy `/api/experiences` and `/api/experiences/{article_id}` (env: NEWS_API_BASE, NEWS_SITE_PATH).
 - Routes `/work/{article_id}`; detail shows title, date, image + credit, sanitized HTML body (images/video), more-work cards. Loading, error/retry and not-found states.
 
+## Iteration 3 (2026-06)
+- Favicon set (svg, ico, png 32/180/192/512) + manifest.json, based on the YNNCK logo.
+- Removed all platform/AI-tool traces: tracking + platform scripts from index.html, dev overlay/visual-edit packages + craco hooks, unused AI libraries from backend, template leftovers.
+
 ## Backlog
 - Short cache on the CMS proxy; show `excerpt` on cards once filled in the CMS.
 - P1: Full CV page in same style (currently links to ynnck.dev/cv); social share titles/preview images.
