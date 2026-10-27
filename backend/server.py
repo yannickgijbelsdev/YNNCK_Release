@@ -74,13 +74,16 @@ NEWS_SITE_PATH = os.environ['NEWS_SITE_PATH']
 
 
 async def fetch_news(path: str):
-    async with httpx.AsyncClient(timeout=15, follow_redirects=True) as c:
-        r = await c.get(f"{NEWS_API_BASE}{path}")
-    if r.status_code == 404:
-        raise HTTPException(404, "Not found")
-    if r.status_code != 200:
+    try:
+        async with httpx.AsyncClient(timeout=15, follow_redirects=True) as c:
+            r = await c.get(f"{NEWS_API_BASE}{path}")
+        if r.status_code == 404:
+            raise HTTPException(404, "Not found")
+        if r.status_code != 200:
+            raise HTTPException(502, "News service unavailable")
+        return r.json()
+    except (httpx.HTTPError, ValueError):
         raise HTTPException(502, "News service unavailable")
-    return r.json()
 
 
 @api_router.get("/experiences")

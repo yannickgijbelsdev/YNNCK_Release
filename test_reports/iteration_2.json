@@ -1,0 +1,43 @@
+{
+  "summary": "Tested the experiences API proxy and its frontend integration. Backend: 8/8 pytest pass (list returns 4 items with correct ids, title and image_url; all 4 details return body/image_url; /foo gives 404; a path-traversal style id gives 404). Frontend: home #work shows 4 project-card-{id} in API order with background images. Skeleton and error box with retry checked by forcing a 502 via route interception. Clicking a card navigates client-side to /work/{id}. The detail page shows the 'August 2026' label, title, hero image with the © credit, body, a mailto link with the subject, the back link to /#work, 3 more-card links and document.title. /work/foo shows project-not-found with a back link. No horizontal overflow at 390px. Rest of the home page (hero, skills, CV timeline, contact, footer, nav) renders with no broken images. Found and fixed one runtime error crash. One open issue: the OVB video is not responsive.",
+  "backend_issues": {
+    "critical": [],
+    "minor": [
+      {"endpoint": "/api/experiences*", "issue": "fetch_news does not catch httpx exceptions (timeout or connection errors) or invalid JSON. If the upstream fails, the endpoint returns an unhandled 500 instead of the intended 502. Wrap the call in try/except httpx.HTTPError -> 502."},
+      {"endpoint": "/api/experiences*", "issue": "No caching. Every page view makes 1-2 calls to the external CMS (15s timeout). A short TTL cache would make it faster and more resilient."}
+    ]
+  },
+  "frontend_issues": {
+    "ui_bugs": [
+      {"component": "Project body video (OVB article 4e152384...)", "issue": "Video is not responsive. The CMS inline style 'width:1184px;height:592px' stays in place. Width gets capped by max-width, but height stays at 592px. The result is a 362x592 tall black box on 390px mobile and 760x592 on desktop (wrong aspect ratio, large letterbox). Fix: .pbody video,.pbody iframe{width:100%!important;max-width:100%;height:auto!important;aspect-ratio:16/9;border-radius:24px}", "selector": "[data-testid=project-body] video", "priority": "MEDIUM"},
+      {"component": "Timeline (Home)", "issue": "FIXED by tester: a pending requestAnimationFrame(upd) ran after Home unmounted when navigating to /work/{id}. fill.current was null, which threw 'Cannot read properties of null (reading parentElement)' and showed the runtime-error overlay. Added a guard at the start of upd. The cleanup should also cancel the rAF.", "selector": "[data-testid=cv-timeline]", "priority": "HIGH"}
+    ],
+    "integration_issues": [
+      {"flow": "Detail page error state", "issue": "useExperience has retry:false and any error (network or 502) shows 'Not found.'. A temporary upstream outage looks like a missing article. Only show not-found on 404 and show a retry for other errors.", "affected_selectors": ["[data-testid=project-not-found]"]}
+    ],
+    "design_issues": [
+      {"screen": "Home #work cards (1920px)", "issues": ["Title 'Nostalgie Vlaanderen/België' overflows or clips at the card's right edge ('Vlaanderen/Belg'). Add overflow-wrap:anywhere or a smaller font for long words.", "All cards show the small label 'EXPERIENCE' because the API tags are empty, so the label is not informative. Consider category or published date."]},
+      {"screen": "Detail page", "issues": ["The detail API response has no 'excerpt' field, so the SectionPanel subtitle (ask={p.excerpt}) is empty on every detail page. Fall back to the list item's excerpt or strip text from the body."]}
+    ]
+  },
+  "test_report_links": ["/app/backend/tests/test_experiences.py", "/app/test_reports/pytest/pytest_results.xml"],
+  "action_items": [
+    "Make body videos responsive: override the inline width/height with CSS (see ui_bugs)",
+    "Catch httpx exceptions in fetch_news and return 502",
+    "Detail page: only show 'Not found.' on a 404; show retry for other errors",
+    "Fix title clipping for long words on experience cards",
+    "Detail subtitle is empty because the detail payload has no excerpt; use the excerpt from the list query",
+    "Timeline: also cancelAnimationFrame in the cleanup (a guard was already added)"
+  ],
+  "critical_code_review_comments": [
+    "server.py fetch_news: unhandled httpx.RequestError and JSON decode errors lead to a 500.",
+    "Project.jsx: treats every error as not-found, and p.excerpt is undefined for the detail payload.",
+    "Timeline.jsx: the rAF scheduled in the scroll handler is not cancelled on unmount (now guarded)."
+  ],
+  "updated_files": ["/app/frontend/src/components/Timeline.jsx", "/app/backend/tests/test_experiences.py"],
+  "success_rate": {"backend": "100%", "frontend": "90%"},
+  "seed_data_creation": "none",
+  "retest_needed": false,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "Data comes live from clr.koodh.com through /api/experiences. To test the error state, use page.route('**/api/experiences') to return 502. The OVB article (4e152384...) has a video with inline style 1184x592. The Nostalgie article has one inline img. Run the backend tests with REACT_APP_BACKEND_URL exported."
+}

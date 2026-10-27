@@ -7,6 +7,7 @@ export const Timeline = () => {
   useEffect(() => {
     const tline = ref.current, tis = [...tline.querySelectorAll(".ti")];
     const upd = () => {
+      if (!fill.current || !tline.isConnected) return;
       const rail = tline.querySelector(".rail").getBoundingClientRect();
       const mark = window.innerHeight * 0.62;
       const p = Math.max(0, Math.min(1, (mark - rail.top) / Math.max(1, rail.height)));

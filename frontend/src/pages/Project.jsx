@@ -26,6 +26,14 @@ export default function Project() {
   }, [p]);
 
   if (a.isLoading) return <main id="top" className="wrap pstate" data-testid="project-loading">Loading…</main>;
+  if (a.isError && a.error?.response?.status !== 404)
+    return (
+      <main id="top" data-testid="project-error">
+        <SectionPanel id="project" label="Experiences" lines={["Hmm."]} ask="This experience couldn’t be loaded right now." solo>
+          <button className="pback pretry" onClick={() => a.refetch()} data-testid="project-retry"><span><Right /></span> Try again</button>
+        </SectionPanel>
+      </main>
+    );
   if (a.isError)
     return (
       <main id="top" data-testid="project-not-found">
@@ -34,9 +42,10 @@ export default function Project() {
     );
 
   const credit = p.image_attribution?.credit;
+  const excerpt = p.excerpt || list.data?.find((x) => x.id === p.id)?.excerpt;
   return (
     <main id="top" data-testid={`project-page-${p.id}`}>
-      <SectionPanel id="project" label={fmt(p.published_at) || "Experience"} lines={[p.title]} ask={p.excerpt} solo><Back /></SectionPanel>
+      <SectionPanel id="project" label={fmt(p.published_at) || "Experience"} lines={[p.title]} ask={excerpt} solo><Back /></SectionPanel>
 
       <div className="wrap pdetail">
         {p.image_url && (
