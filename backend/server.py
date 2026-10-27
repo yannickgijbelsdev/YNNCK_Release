@@ -1,4 +1,5 @@
-from fastapi import FastAPI, APIRouter, HTTPException
+from fastapi import FastAPI, APIRouter, HTTPException, Response
+from xml.sax.saxutils import escape as xml_escape
 from urllib.parse import quote
 import httpx
 from dotenv import load_dotenv
@@ -71,6 +72,7 @@ async def get_status_checks():
 # Include the router in the main app
 NEWS_API_BASE = os.environ['NEWS_API_BASE']
 NEWS_SITE_PATH = os.environ['NEWS_SITE_PATH']
+SITE_URL = os.environ['SITE_URL']
 
 
 async def fetch_news(path: str):
@@ -94,6 +96,20 @@ async def list_experiences():
 @api_router.get("/experiences/{article_id}")
 async def get_experience(article_id: str):
     return await fetch_news(f"/articles/{quote(article_id, safe='')}")
+
+
+@api_router.get("/sitemap.xml")
+async def sitemap():
+    data = await fetch_news(NEWS_SITE_PATH)
+    urls = [(f"{SITE_URL}/", None)] + [
+        (f"{SITE_URL}/work/{xml_escape(a['id'])}", (a.get("published_at") or "")[:10] or None)
+        for a in data.get("items", [])
+    ]
+    body = "".join(
+        f"<url><loc>{u}</loc>{f'<lastmod>{d}</lastmod>' if d else ''}</url>" for u, d in urls
+    )
+    xml = f'<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">{body}</urlset>'
+    return Response(xml, media_type="application/xml")
 
 
 app.include_router(api_router)

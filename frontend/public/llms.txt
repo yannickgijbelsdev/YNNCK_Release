@@ -1,0 +1,36 @@
+# YNNCK · Yannick Gijbels
+
+> Yannick Gijbels (brand: YNNCK) is a developer, broadcast engineer and radio imaging producer from Pelt, Limburg, Belgium. He is co-founder of Koodh (IT, websites, Microsoft 365 and custom web systems) and founder of Koodh Media Group (audio branding for radio and event photography). He works in Dutch and English, for clients in Belgium and the Netherlands.
+
+## Contact
+- E-mail: yannick@ynnck.dev
+- Location: Pelt, Limburg, Belgium (serves Belgium and the Netherlands)
+
+## What he does
+- Development: websites, web applications (such as Radiobox for company radio) and automation of routine work.
+- Broadcast & audio: AXIA audio networks, Unraid and Proxmox servers, vMix, radio imaging (sweepers, beds and station IDs).
+- IT support: Microsoft 365 and CodeTwo, B2B support at Autosoft IT Solutions.
+
+## Experience
+- Koodh — Co-Founder (May 2026 – now)
+- Koodh Media Group — Founder (May 2026 – now)
+- Autosoft IT Solutions — IT Support Specialist B2B (Sep 2024 – now)
+- Radio GRK — Co-Technical Lead and Radio Host of "Social Club", Fridays 6–8 p.m. (Jul 2020 – now)
+- TOPradio — Radio Imaging Producer for Dance Top 1000, TOPHit40, Allez Xander! and Dance Top 500 (Sep 2023 – Oct 2024)
+- Radiogroep — Broadcast Engineer for Nostalgie Vlaanderen and Web Application Developer of Radiobox (May 2022 – Nov 2025)
+- Studio Sonart — vMix Operator and Radiobox Lead Developer (Jul 2021 – May 2024)
+- Telenet Group — Technical Advisor and Digital Specialist (Aug 2020 – Apr 2024)
+- Lokale Radio MFY — General Lead, Technical Lead and Radio Host (May 2015 – Jul 2026)
+
+## Education
+- SyntraPXL — Network & System Administration; Full Stack Development
+
+## Skills and tools
+Development, Microsoft 365, Pro Tools, Ableton, vMix, Proxmox, Unraid, AXIA, CodeTwo, Adobe.
+
+## Pages
+- [Home](https://ynnck.dev/): overview, selected experiences, CV and contact
+- [Sitemap](https://ynnck.dev/api/sitemap.xml): all project pages
+- [Koodh](https://koodh.com)
+- [Koodh Media Group](https://koodhmediagroup.com)
+- [127.be](https://127.be): IT tools platform built by Yannick

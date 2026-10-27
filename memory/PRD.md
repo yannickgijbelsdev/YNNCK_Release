@@ -22,7 +22,14 @@
 - Favicon set (svg, ico, png 32/180/192/512) + manifest.json, based on the YNNCK logo.
 - Removed all platform/AI-tool traces: tracking + platform scripts from index.html, dev overlay/visual-edit packages + craco hooks, unused AI libraries from backend, template leftovers.
 
+## Iteration 4 (2026-06): SEO & GEO
+- index.html: full meta (description, canonical, robots, geo.* Pelt/BE-VLI, Open Graph, Twitter card), JSON-LD graph (WebSite, ProfilePage, Person, ProfessionalService with address/geo/areaServed), noscript text version of the profile.
+- og-image.jpg (1200x630). robots.txt, llms.txt, dynamic sitemap at /api/sitemap.xml (home + CMS articles).
+- useMeta hook: per-page title/description/canonical/OG + Article JSON-LD on project pages; h1 per page; lang="nl" on CMS bodies; lazy images with alt.
+- Env: REACT_APP_SITE_URL, SITE_URL (https://ynnck.dev).
+
 ## Backlog
+- Server-side rendering/prerender of /work/* so social previews show each project's own image.
 - Short cache on the CMS proxy; show `excerpt` on cards once filled in the CMS.
 - P1: Full CV page in same style (currently links to ynnck.dev/cv); social share titles/preview images.
 - P2: Mobile menu for nav links, "now on air" badge, more projects, real project texts/images from Yannick.

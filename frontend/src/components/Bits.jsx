@@ -49,16 +49,19 @@ export const Card = ({ c, testid }) => {
   return <div className={cls} style={style} data-testid={testid}>{inner}</div>;
 };
 
-export const SectionPanel = ({ id, label, lines, ask, children, tall, wide, cards, solo }) => (
+export const SectionPanel = ({ id, label, lines, ask, children, tall, wide, cards, solo, h1 }) => {
+  const H = h1 ? "h1" : "h2";
+  return (
   <div className={`hero2 wrap blk${solo ? " solo" : ""}`} id={id} data-testid={`section-${id}`}>
     <div className={`panel sm${tall ? " tall" : ""}`}>
       <div className={`ptxt${wide ? " wide" : ""}`}>
         <span className="plabel">{label}</span>
-        <h2 className="ptitle"><Words lines={lines} /></h2>
+        <H className="ptitle"><Words lines={lines} /></H>
         {ask && <p className="ask">{ask}</p>}
         {children}
       </div>
     </div>
     {cards}
   </div>
-);
+  );
+};

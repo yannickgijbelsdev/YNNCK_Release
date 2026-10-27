@@ -3,6 +3,7 @@ import { useLocation } from "react-router-dom";
 import { Card, Right, SectionPanel } from "@/components/Bits";
 import { Timeline } from "@/components/Timeline";
 import { useReveal } from "@/hooks/useReveal";
+import { useMeta } from "@/hooks/useMeta";
 import { ExperienceCards } from "@/components/ExperienceCards";
 import { useExperiences } from "@/lib/api";
 import { DOTS, EMAIL, HIGHLIGHTS, INTRO, SKILLS, STEPS } from "@/data/site";
@@ -22,7 +23,7 @@ const Hero = () => {
     <div className="hero2 wrap" id="hero" data-testid="section-hero">
       <div className="panel">
         <div className="ptxt">
-          <h1 data-testid="hero-title"><span className="w" style={{ "--d": 0 }}>Building</span><br /><span className="w" style={{ "--d": 1 }}>stories.</span></h1>
+          <h1 data-testid="hero-title"><span className="sr-only">Yannick Gijbels: developer, broadcast engineer and radio imaging producer from Pelt, Belgium. </span><span className="w" style={{ "--d": 0 }} aria-hidden="true">Building</span><br /><span className="w" style={{ "--d": 1 }} aria-hidden="true">stories.</span></h1>
           <p className="ask w" style={{ "--d": 3 }}>What can I help you with?</p>
           <div className="dots" aria-label="Worked with" data-testid="hero-logos">
             {DOTS.map((d, i) => (
@@ -32,7 +33,7 @@ const Hero = () => {
             ))}
           </div>
         </div>
-        <div className="pimg"><img ref={pim} src="/img/portrait.webp" alt="Portrait of Yannick Gijbels" data-testid="hero-portrait" /></div>
+        <div className="pimg"><img ref={pim} src="/img/portrait.webp" alt="Portrait of Yannick Gijbels, developer and broadcast engineer from Pelt" width="752" height="781" fetchpriority="high" data-testid="hero-portrait" /></div>
       </div>
       <div className="cards3">
         {INTRO.map((c) => <Card key={c.title} c={c} testid={`intro-card-${slug(c.title)}`} />)}
@@ -45,6 +46,7 @@ export default function Home() {
   const { hash } = useLocation();
   const exp = useExperiences();
   useReveal(`home-${exp.status}`);
+  useMeta({ title: "YNNCK · Yannick Gijbels · Developer & broadcast engineer, Pelt", path: "/" });
 
   useEffect(() => {
     if (!hash) return;
