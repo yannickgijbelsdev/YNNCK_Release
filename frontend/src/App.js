@@ -12,7 +12,7 @@ function App() {
       <Header />
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/work/:slug" element={<Project />} />
+        <Route path="/work/:id" element={<Project />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
       <Footer />

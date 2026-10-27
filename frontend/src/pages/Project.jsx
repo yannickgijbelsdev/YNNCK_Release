@@ -1,43 +1,60 @@
-import { useEffect } from "react";
-import { Link, Navigate, useParams } from "react-router-dom";
-import { Card, Right, SectionPanel, UpRight } from "@/components/Bits";
+import { useEffect, useMemo } from "react";
+import { Link, useParams } from "react-router-dom";
+import DOMPurify from "dompurify";
+import { Right, SectionPanel } from "@/components/Bits";
+import { ExperienceCards } from "@/components/ExperienceCards";
 import { useReveal } from "@/hooks/useReveal";
-import { EMAIL, PROJECTS } from "@/data/site";
+import { useExperience, useExperiences } from "@/lib/api";
+import { EMAIL } from "@/data/site";
+
+const Back = () => <Link className="pback" to="/#work" data-testid="project-back-link"><span><Right /></span> All experiences</Link>;
+
+const fmt = (d) => d && new Date(d).toLocaleDateString("en-GB", { month: "long", year: "numeric" });
 
 export default function Project() {
-  const { slug } = useParams();
-  const p = PROJECTS.find((x) => x.slug === slug);
-  useReveal(slug);
+  const { id } = useParams();
+  const a = useExperience(id);
+  const list = useExperiences();
+  const p = a.data;
+  const html = useMemo(() => (p?.body ? DOMPurify.sanitize(p.body) : ""), [p]);
+  useReveal(`${id}-${a.status}-${list.status}`);
+
+  useEffect(() => { window.scrollTo(0, 0); }, [id]);
   useEffect(() => {
-    window.scrollTo(0, 0);
     if (p) document.title = `${p.title} · YNNCK · Yannick Gijbels`;
     return () => { document.title = "YNNCK · Yannick Gijbels"; };
-  }, [slug, p]);
-  if (!p) return <Navigate to="/" replace />;
-  const others = PROJECTS.filter((x) => x.slug !== slug).map((x) => ({ ...x, to: `/work/${x.slug}` }));
+  }, [p]);
 
+  if (a.isLoading) return <main id="top" className="wrap pstate" data-testid="project-loading">Loading…</main>;
+  if (a.isError)
+    return (
+      <main id="top" data-testid="project-not-found">
+        <SectionPanel id="project" label="Experiences" lines={["Not found."]} ask="This experience isn’t available (anymore)." solo><Back /></SectionPanel>
+      </main>
+    );
+
+  const credit = p.image_attribution?.credit;
   return (
-    <main id="top" data-testid={`project-page-${p.slug}`}>
-      <SectionPanel id="project" label={p.small} lines={[p.title]} ask={p.text} solo>
-        <Link className="pback" to="/#work" data-testid="project-back-link"><span><Right /></span> All experiences</Link>
-      </SectionPanel>
+    <main id="top" data-testid={`project-page-${p.id}`}>
+      <SectionPanel id="project" label={fmt(p.published_at) || "Experience"} lines={[p.title]} ask={p.excerpt} solo><Back /></SectionPanel>
 
       <div className="wrap pdetail">
-        <figure className={`pfig ${p.tone}`} data-testid="project-image"><img src={p.img} alt={p.title} /></figure>
+        {p.image_url && (
+          <figure className="pfig" data-testid="project-image">
+            <img src={p.image_url} alt={p.title} />
+            {credit && <figcaption>© {credit}</figcaption>}
+          </figure>
+        )}
         <div className="pcopy">
-          <dl className="pfacts" data-testid="project-facts">
-            {p.facts.map(([k, v]) => <div key={k}><dt>{k}</dt><dd>{v}</dd></div>)}
-          </dl>
-          <div className="pbody" data-testid="project-body">{p.body.map((t, i) => <p key={i}>{t}</p>)}</div>
+          <div className="pbody" data-testid="project-body" dangerouslySetInnerHTML={{ __html: html }} />
           <div className="pactions">
             <a className="btn primary" href={`mailto:${EMAIL}?subject=${encodeURIComponent(`About ${p.title}`)}`} data-testid="project-email-button">Ask about this project <Right /></a>
-            {p.links?.map(([l, h]) => <a key={h} className="btn ghost" href={h} data-testid={`project-ext-link-${l.replace(/\W+/g, "-")}`}>{l} <UpRight /></a>)}
           </div>
         </div>
       </div>
 
       <SectionPanel id="more" label="Experiences" lines={["More work."]} ask="Other projects I’ve been part of."
-        cards={<div className="cards3">{others.map((c) => <Card key={c.slug} c={c} testid={`more-card-${c.slug}`} />)}</div>} />
+        cards={<ExperienceCards q={list} exclude={p.id} prefix="more-card" />} />
     </main>
   );
 }

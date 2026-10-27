@@ -3,7 +3,9 @@ import { useLocation } from "react-router-dom";
 import { Card, Right, SectionPanel } from "@/components/Bits";
 import { Timeline } from "@/components/Timeline";
 import { useReveal } from "@/hooks/useReveal";
-import { DOTS, EMAIL, HIGHLIGHTS, INTRO, PROJECTS, SKILLS, STEPS } from "@/data/site";
+import { ExperienceCards } from "@/components/ExperienceCards";
+import { useExperiences } from "@/lib/api";
+import { DOTS, EMAIL, HIGHLIGHTS, INTRO, SKILLS, STEPS } from "@/data/site";
 
 const K = () => <svg viewBox="66 26 42 51"><polygon points="91.95,30.476 98.589,30.476 77.733,47.939 102.696,72.502 96.441,72.502 71.467,47.939" /></svg>;
 const slug = (s) => s.toLowerCase().replace(/[^a-z0-9]+/g, "-");
@@ -41,7 +43,8 @@ const Hero = () => {
 
 export default function Home() {
   const { hash } = useLocation();
-  useReveal("home");
+  const exp = useExperiences();
+  useReveal(`home-${exp.status}`);
 
   useEffect(() => {
     if (!hash) return;
@@ -59,7 +62,7 @@ export default function Home() {
     <main id="top">
       <Hero />
       <SectionPanel id="work" label="Experiences" lines={["Selected", "experiences."]} ask="Projects and work I’ve been part of over the years."
-        cards={cards(PROJECTS.map((p) => ({ ...p, to: `/work/${p.slug}` })), "c4", "project-card")} />
+        cards={<ExperienceCards q={exp} prefix="project-card" />} />
       <SectionPanel id="skills" label="What I do" lines={["Code, cloud", "and sound."]} ask="Most of my work sits where IT and media meet."
         cards={cards(SKILLS, "c3", "skill-card")} />
       <SectionPanel id="cv" label="Curriculum vitae" lines={["Experience."]} tall wide cards={cards(HIGHLIGHTS, "", "highlight-card")}>

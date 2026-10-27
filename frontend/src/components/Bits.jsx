@@ -40,7 +40,7 @@ export const Card = ({ c, testid }) => {
       <i className={`pt pt${c.pt}`} aria-hidden="true" />
       <small>{c.small}</small>
       <h3>{c.title}</h3>
-      <p>{c.text}</p>
+      {c.text && <p>{c.text}</p>}
       {(c.to || c.href) && <span className="go"><UpRight /></span>}
     </>
   );

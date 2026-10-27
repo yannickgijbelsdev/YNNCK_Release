@@ -16,52 +16,6 @@ export const INTRO = [
   { tone: "n", pt: 3, small: "Co-founder", title: "Koodh", text: "Websites, Microsoft 365, AI and IT for businesses.", href: "https://koodh.com" },
 ];
 
-// Detail write-ups are placeholders based on the card line and CV; replace with Yannick's own text.
-export const PROJECTS = [
-  {
-    slug: "ovb-congres", tone: "p", pt: 4, small: "Radio Magie", title: "OVB Congres",
-    text: "On-air branding for the OVB congress.", img: "/img/work-ovb.webp",
-    facts: [["Discipline", "Radio imaging · Audio branding"], ["Client", "OVB Congres"], ["Station", "Radio Magie"]],
-    body: [
-      "For the OVB congress, Radio Magie needed an on-air sound that felt like the event itself: recognisable, warm and confident from the first second.",
-      "I produced the on-air branding: station IDs, sweepers and beds that tie every link, announcement and break together, so listeners always know where they are.",
-      "The result is a consistent audio identity that carried the congress through the full programme, built with the same care I bring to radio imaging for national stations.",
-    ],
-  },
-  {
-    slug: "nostalgie", tone: "o", pt: 5, small: "Broadcast", title: "Nostalgie",
-    text: "Broadcast engineering for Radiogroep.", img: "/img/work-nostalgie.webp",
-    facts: [["Role", "Broadcast Engineer"], ["Client", "Radiogroep · Nostalgie Vlaanderen"], ["Period", "May 2022 – Nov 2025"]],
-    body: [
-      "At Radiogroep I worked as broadcast engineer for Nostalgie Vlaanderen, keeping the station on air and sounding the way it should.",
-      "That meant looking after studio and playout systems, audio routing and the technical chain from microphone to transmitter, and stepping in fast when something needed fixing.",
-      "Alongside the engineering I developed Radiobox, the web application Radiogroep used for company radio, Thomas More, Zoo Media and Radio Roem.",
-    ],
-  },
-  {
-    slug: "koodh", tone: "n", pt: 6, small: "Two companies", title: "Koodh & Media Group",
-    text: "IT, websites, audio branding and photography.", img: "/img/work-koodh.webp",
-    facts: [["Koodh", "Co-Founder"], ["Koodh Media Group", "Founder"], ["Since", "May 2026"]],
-    links: [["koodh.com", "https://koodh.com"], ["koodhmediagroup.com", "https://koodhmediagroup.com"]],
-    body: [
-      "Koodh and Koodh Media Group are the two companies I run, each covering one half of what I do.",
-      "Koodh brings IT solutions to businesses and individuals: e-mail signatures, Microsoft 365, consulting, websites, AI and custom web systems.",
-      "Koodh Media Group focuses on the creative side, with event photography and audio imaging for a range of companies and radio stations.",
-    ],
-  },
-  {
-    slug: "127", tone: "k", pt: 7, small: "Tool platform", title: "127",
-    text: "IT tools in one place, used daily at Autosoft.", img: "/img/work-127.webp",
-    facts: [["Type", "Tool platform"], ["Used at", "Autosoft IT Solutions"], ["Web", "127.be"]],
-    links: [["127.be", "https://127.be"]],
-    body: [
-      "127 bundles the IT tools I kept reaching for into one place, so support work starts in a single tab instead of ten.",
-      "It grew out of daily B2B support at Autosoft, where speed matters: quick lookups, checks and handy utilities for Microsoft 365 and beyond.",
-      "Today it is used every day by the team at Autosoft, and it keeps growing whenever a new routine task deserves its own tool.",
-    ],
-  },
-];
-
 export const SKILLS = [
   { tone: "p", pt: 8, small: "Development & AI", title: "Websites & AI", text: "Websites, web apps like Radiobox and AI that takes routine work off people’s hands.", href: "https://koodh.com" },
   { tone: "o", pt: 9, small: "Broadcast & audio", title: "Radio", text: "AXIA networks, Unraid and Proxmox servers, vMix and radio imaging for TOPradio.", href: "#cv" },

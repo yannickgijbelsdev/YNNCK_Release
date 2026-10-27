@@ -1,4 +1,6 @@
-from fastapi import FastAPI, APIRouter
+from fastapi import FastAPI, APIRouter, HTTPException
+from urllib.parse import quote
+import httpx
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
@@ -67,6 +69,30 @@ async def get_status_checks():
     return status_checks
 
 # Include the router in the main app
+NEWS_API_BASE = os.environ['NEWS_API_BASE']
+NEWS_SITE_PATH = os.environ['NEWS_SITE_PATH']
+
+
+async def fetch_news(path: str):
+    async with httpx.AsyncClient(timeout=15, follow_redirects=True) as c:
+        r = await c.get(f"{NEWS_API_BASE}{path}")
+    if r.status_code == 404:
+        raise HTTPException(404, "Not found")
+    if r.status_code != 200:
+        raise HTTPException(502, "News service unavailable")
+    return r.json()
+
+
+@api_router.get("/experiences")
+async def list_experiences():
+    return await fetch_news(NEWS_SITE_PATH)
+
+
+@api_router.get("/experiences/{article_id}")
+async def get_experience(article_id: str):
+    return await fetch_news(f"/articles/{quote(article_id, safe='')}")
+
+
 app.include_router(api_router)
 
 app.add_middleware(
