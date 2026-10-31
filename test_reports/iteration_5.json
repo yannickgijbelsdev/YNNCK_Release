@@ -1,0 +1,34 @@
+{
+  "summary": "Verified the /api/img robustness refactor. DEDUP: after rm -rf /tmp/ynnck-img (which also exercises the lazy mkdir in render_all), 6 parallel public-URL requests for the same src with w=480/800/1200/1600/800/1600 all returned 200 valid WEBP. The backend log showed exactly ONE upstream GET for that object, and all widths were rendered with no .tmp leftovers. TIMEOUT: an in-process unit test (build_images mocked as slow, wait_for timeout shortened) confirmed 3 concurrent requests get 503 with Retry-After: 10 while the shielded task keeps running (called once), then caches; the next request returns 200 and IMG_TASKS is cleaned up. Validation: foreign host, '..', backslash, w=801 -> 400; w=abc -> 422; missing upstream object -> 404. Regression: /api/experiences (4 items), /api/experiences/{id} for all 4, unknown id 404, sitemap 200 with 5 <loc>. Full suite: 45/46 passed; the 1 failure was a stale test calling the removed render_webp, which I updated to render_all and which now passes. UI: home #work shows 4 cards with images on desktop and mobile (no horizontal overflow). All 4 detail heroes load at 1600, the OVB video has readyState 4, and the 3f4564a9 body image (editor/74ff2a08) loads at 1200 once cached. No console errors and no 4xx/5xx in the final runs. The cache is left warm: 20 files (4 heroes x 4 widths plus the body image x 4 widths).",
+  "backend_issues": {
+    "critical": [],
+    "minor": [
+      {"endpoint": "/api/img (body images)", "issue": "warm_images only pre-warms article hero images (image_url). Body/editor images such as editor/74ff2a08...jpg (in the 3f4564a9 article) are not pre-warmed. While the cache was cold, upstream returned 504 after 60s (direct curl) plus 503 SlowDown. The browser then got 503 after 45s, twice in a row, until the upstream recovered about 3 minutes later (then 200 in 20s, cached at 0.23s). Suggestion: also warm images referenced in article content (each /api/experiences/{id} body)."},
+      {"endpoint": "/api/img background task", "issue": "When a shielded build task fails after all waiters timed out, asyncio logs 'Task exception was never retrieved' with a traceback (seen in backend.err.log at 13:01:30). Add a done_callback that calls t.exception() (or logs it) to silence the noise."}
+    ]
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [
+      {"flow": "Image 503 Retry-After", "issue": "The frontend <img> does not retry after a 503 from /api/img; a cold or slow image stays broken until reload. Optional: an onError handler that retries once or twice after ~10s (with a cache-bust param), honoring Retry-After.", "affected_selectors": ["[data-testid='project-body'] img", "#work card images"]}
+    ],
+    "design_issues": []
+  },
+  "test_report_links": ["/app/backend/tests/test_iter5_dedup.py", "/app/backend/tests/test_iter5_timeout_unit.py", "/app/backend/tests/test_iter4_fixes.py", "/app/backend/tests/test_img_proxy.py", "/app/backend/tests/test_experiences.py", "/app/test_reports/pytest/pytest_results.xml", "/app/test_reports/pytest/pytest_iter5.xml"],
+  "action_items": [
+    "Optional: pre-warm body/editor images from the article content, not just image_url",
+    "Optional: add a done_callback on IMG tasks to retrieve and log the exception (avoids 'Task exception was never retrieved')",
+    "Optional: client-side retry on image error (503 Retry-After)"
+  ],
+  "critical_code_review_comments": [
+    "Dedup, shield and background completion are implemented correctly; the done_callback pop keeps IMG_TASKS clean",
+    "httpx timeout=30 is per operation, so a trickling upstream can stretch one attempt well past 30s. The total task time is unbounded, but the client is protected by the 45s wait, so this is acceptable",
+    "No negative cache: a failing src is retried on every request (reasonable for transient SlowDown)"
+  ],
+  "updated_files": ["/app/backend/tests/test_iter4_fixes.py (render_webp -> render_all)", "/app/backend/tests/test_iter5_dedup.py (new)", "/app/backend/tests/test_iter5_timeout_unit.py (new)"],
+  "success_rate": {"backend": "100% (46/46 after fixing the stale test)", "frontend": "100%"},
+  "seed_data_creation": "none",
+  "retest_needed": false,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "Run tests with -n 0 (test_iter5_dedup and test_iter4 concurrent tests rmtree /tmp/ynnck-img). Upstream log lines 'HTTP Request: GET <src>' in /var/log/supervisor/backend.err.log are used to count upstream hits. Upstream objects 3f4564a9 and editor/74ff2a08 can be very slow or 504; re-warm the cache after running destructive tests (heroes at w=800/1600 and the body image at 1200)."
+}

@@ -4,6 +4,7 @@ from PIL import Image, ImageOps, UnidentifiedImageError
 import asyncio
 import hashlib
 import io
+import re
 import tempfile
 from xml.sax.saxutils import escape as xml_escape
 from urllib.parse import quote
@@ -147,7 +148,7 @@ def ensure_images(src: str) -> asyncio.Task:
     if task is None:
         task = asyncio.create_task(build_images(src))
         IMG_TASKS[src] = task
-        task.add_done_callback(lambda _t: IMG_TASKS.pop(src, None))
+        task.add_done_callback(lambda t: (IMG_TASKS.pop(src, None), t.cancelled() or t.exception()))
     return task
 
 
@@ -179,8 +180,15 @@ def render_all(data: bytes, src: str):
 async def warm_images():
     try:
         data = await fetch_news(NEWS_SITE_PATH)
+        srcs = []
         for a in data.get("items", []):
-            src = a.get("image_url") or ""
+            srcs.append(a.get("image_url") or "")
+            try:
+                art = await fetch_news(f"/articles/{quote(a['id'], safe='')}")
+                srcs += re.findall(r'<img[^>]+src="([^"]+)"', art.get("body") or "")
+            except HTTPException:
+                pass
+        for src in dict.fromkeys(srcs):
             if src.startswith(IMAGE_ALLOWED_PREFIX) and not img_path(src, 800).exists():
                 try:
                     await ensure_images(src)

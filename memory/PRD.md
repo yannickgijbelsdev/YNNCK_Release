@@ -28,7 +28,14 @@
 - useMeta hook: per-page title/description/canonical/OG + Article JSON-LD on project pages; h1 per page; lang="nl" on CMS bodies; lazy images with alt.
 - Env: REACT_APP_SITE_URL, SITE_URL (https://ynnck.dev).
 
+## Iteration 5 (2026-10): bugfix "Selected experiences laden niet"
+- Cause: CMS images on Hetzner object storage return intermittent 503 SlowDown (browser ERR_BLOCKED_BY_ORB) and are 2–7 MB.
+- Fix: /api/img proxy (allowlisted bucket via IMAGE_ALLOWED_PREFIX): retries, one download per image, renders WebP at 480/800/1200/1600, disk cache, 45s client cap with background completion, startup pre-warm of hero + body images. CMS JSON fetch retries on 5xx.
+- Cards, detail hero, body images and OG image use the proxy. Tested (iterations 3–5) 100%.
+
 ## Backlog
+- Video in articles still loads directly from object storage.
+- Client-side retry for images on 503.
 - Server-side rendering/prerender of /work/* so social previews show each project's own image.
 - Short cache on the CMS proxy; show `excerpt` on cards once filled in the CMS.
 - P1: Full CV page in same style (currently links to ynnck.dev/cv); social share titles/preview images.

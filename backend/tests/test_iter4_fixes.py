@@ -58,7 +58,7 @@ def test_render_webp_non_image(tmp_path):
     from PIL import UnidentifiedImageError
     import server
     with pytest.raises((UnidentifiedImageError, OSError)):
-        server.render_webp(b"<html>not an image</html>", 800, tmp_path / "x.webp")
+        server.render_all(b"<html>not an image</html>", "https://x/unit-nonimage.jpg")
 
 
 def test_img_endpoint_non_image_502(monkeypatch):
