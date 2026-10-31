@@ -4,6 +4,8 @@ import { useQuery } from "@tanstack/react-query";
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 const TONES = ["p", "o", "n", "k"];
 
+export const imgUrl = (src, w = 1200) => (src ? `${API}/img?src=${encodeURIComponent(src)}&w=${w}` : src);
+
 export const useExperiences = () =>
   useQuery({ queryKey: ["experiences"], queryFn: () => axios.get(`${API}/experiences`).then((r) => r.data.items || []) });
 
@@ -19,6 +21,6 @@ export const toCard = (a, i) => ({
   small: tagName(a.tags?.[0]) || "Experience",
   title: a.title,
   text: a.excerpt,
-  img: a.image_url,
+  img: imgUrl(a.image_url, 800),
   to: `/work/${a.id}`,
 });

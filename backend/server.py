@@ -1,4 +1,10 @@
 from fastapi import FastAPI, APIRouter, HTTPException, Response
+from fastapi.responses import FileResponse
+from PIL import Image, ImageOps
+import asyncio
+import hashlib
+import io
+import tempfile
 from xml.sax.saxutils import escape as xml_escape
 from urllib.parse import quote
 import httpx
@@ -73,6 +79,10 @@ async def get_status_checks():
 NEWS_API_BASE = os.environ['NEWS_API_BASE']
 NEWS_SITE_PATH = os.environ['NEWS_SITE_PATH']
 SITE_URL = os.environ['SITE_URL']
+IMAGE_ALLOWED_PREFIX = os.environ['IMAGE_ALLOWED_PREFIX']
+IMG_WIDTHS = {480, 800, 1200, 1600}
+IMG_CACHE = Path(tempfile.gettempdir()) / "ynnck-img"
+IMG_CACHE.mkdir(exist_ok=True)
 
 
 async def fetch_news(path: str):
@@ -96,6 +106,39 @@ async def list_experiences():
 @api_router.get("/experiences/{article_id}")
 async def get_experience(article_id: str):
     return await fetch_news(f"/articles/{quote(article_id, safe='')}")
+
+
+@api_router.get("/img")
+async def image(src: str, w: int = 1200):
+    if not src.startswith(IMAGE_ALLOWED_PREFIX) or w not in IMG_WIDTHS:
+        raise HTTPException(400, "Invalid image")
+    key = hashlib.sha256(f"{src}|{w}".encode()).hexdigest()
+    path = IMG_CACHE / f"{key}.webp"
+    if not path.exists():
+        data = None
+        async with httpx.AsyncClient(timeout=30, follow_redirects=True) as c:
+            for attempt in range(5):
+                try:
+                    r = await c.get(src)
+                    if r.status_code == 200:
+                        data = r.content
+                        break
+                    if r.status_code not in (429, 500, 502, 503, 504):
+                        raise HTTPException(404, "Image not found")
+                except httpx.HTTPError:
+                    pass
+                await asyncio.sleep(0.4 * (2 ** attempt))
+        if data is None:
+            raise HTTPException(502, "Image unavailable")
+        im = Image.open(io.BytesIO(data))
+        im = ImageOps.exif_transpose(im)
+        im = im.convert("RGBA" if im.mode in ("RGBA", "LA", "P") else "RGB")
+        if im.width > w:
+            im = im.resize((w, round(im.height * w / im.width)), Image.LANCZOS)
+        tmp = path.with_suffix(".tmp")
+        im.save(tmp, "WEBP", quality=80, method=4)
+        tmp.replace(path)
+    return FileResponse(path, media_type="image/webp", headers={"Cache-Control": "public, max-age=31536000, immutable"})
 
 
 @api_router.get("/sitemap.xml")

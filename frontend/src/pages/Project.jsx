@@ -5,7 +5,7 @@ import { Right, SectionPanel } from "@/components/Bits";
 import { ExperienceCards } from "@/components/ExperienceCards";
 import { useReveal } from "@/hooks/useReveal";
 import { useMeta } from "@/hooks/useMeta";
-import { useExperience, useExperiences } from "@/lib/api";
+import { imgUrl, useExperience, useExperiences } from "@/lib/api";
 import { EMAIL } from "@/data/site";
 
 const Back = () => <Link className="pback" to="/#work" data-testid="project-back-link"><span><Right /></span> All experiences</Link>;
@@ -19,10 +19,12 @@ export default function Project() {
   const p = a.data;
   const { html, text } = useMemo(() => {
     if (!p?.body) return { html: "", text: "" };
+    const bucket = p.image_url && `${p.image_url.split("/").slice(0, 4).join("/")}/`;
     const t = document.createElement("template");
     t.innerHTML = DOMPurify.sanitize(p.body);
     t.content.querySelectorAll("img").forEach((img) => {
       img.loading = "lazy";
+      if (bucket && img.src.startsWith(bucket)) img.src = imgUrl(img.src, 1200);
       if (!img.alt) img.alt = p.title;
     });
     t.content.querySelectorAll(".clara-image-credit").forEach((n, i) => i === 0 && n.remove());
@@ -37,7 +39,7 @@ export default function Project() {
     "@type": "Article",
     headline: p.title,
     description: desc,
-    image: p.image_url ? [p.image_url] : undefined,
+    image: p.image_url ? [imgUrl(p.image_url, 1200)] : undefined,
     datePublished: p.published_at,
     inLanguage: "nl",
     url: `${process.env.REACT_APP_SITE_URL}/work/${p.id}`,
@@ -49,7 +51,7 @@ export default function Project() {
     title: p ? `${p.title} · YNNCK · Yannick Gijbels` : "YNNCK · Yannick Gijbels",
     description: desc,
     path: `/work/${id}`,
-    image: p?.image_url || undefined,
+    image: imgUrl(p?.image_url, 1200) || undefined,
     type: p ? "article" : "website",
     jsonLd,
   });
@@ -81,7 +83,7 @@ export default function Project() {
       <div className="wrap pdetail">
         {p.image_url && (
           <figure className="pfig" data-testid="project-image">
-            <img src={p.image_url} alt={p.title} fetchpriority="high" />
+            <img src={imgUrl(p.image_url, 1600)} alt={p.title} fetchPriority="high" />
             {credit && <figcaption>© {credit}</figcaption>}
           </figure>
         )}

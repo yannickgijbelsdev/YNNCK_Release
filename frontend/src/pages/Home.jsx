@@ -33,7 +33,7 @@ const Hero = () => {
             ))}
           </div>
         </div>
-        <div className="pimg"><img ref={pim} src="/img/portrait.webp" alt="Portrait of Yannick Gijbels, developer and broadcast engineer from Pelt" width="752" height="781" fetchpriority="high" data-testid="hero-portrait" /></div>
+        <div className="pimg"><img ref={pim} src="/img/portrait.webp" alt="Portrait of Yannick Gijbels, developer and broadcast engineer from Pelt" width="752" height="781" fetchPriority="high" data-testid="hero-portrait" /></div>
       </div>
       <div className="cards3">
         {INTRO.map((c) => <Card key={c.title} c={c} testid={`intro-card-${slug(c.title)}`} />)}
