@@ -39,7 +39,7 @@ export const Card = ({ c, testid }) => {
     <>
       <i className={`pt pt${c.pt}`} aria-hidden="true" />
       <small>{c.small}</small>
-      <h3>{c.title}</h3>
+      <h3>{typeof c.title === "string" ? c.title.split(/(?<=\/)/).map((t, i) => <span key={i}>{i > 0 && <wbr />}{t}</span>) : c.title}</h3>
       {c.text && <p>{c.text}</p>}
       {(c.to || c.href) && <span className="go"><UpRight /></span>}
     </>

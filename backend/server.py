@@ -1,6 +1,6 @@
 from fastapi import FastAPI, APIRouter, HTTPException, Response
 from fastapi.responses import FileResponse
-from PIL import Image, ImageOps
+from PIL import Image, ImageOps, UnidentifiedImageError
 import asyncio
 import hashlib
 import io
@@ -88,7 +88,11 @@ IMG_CACHE.mkdir(exist_ok=True)
 async def fetch_news(path: str):
     try:
         async with httpx.AsyncClient(timeout=15, follow_redirects=True) as c:
-            r = await c.get(f"{NEWS_API_BASE}{path}")
+            for attempt in range(3):
+                r = await c.get(f"{NEWS_API_BASE}{path}")
+                if r.status_code not in (429, 500, 502, 503, 504):
+                    break
+                await asyncio.sleep(0.4 * (2 ** attempt))
         if r.status_code == 404:
             raise HTTPException(404, "Not found")
         if r.status_code != 200:
@@ -110,7 +114,7 @@ async def get_experience(article_id: str):
 
 @api_router.get("/img")
 async def image(src: str, w: int = 1200):
-    if not src.startswith(IMAGE_ALLOWED_PREFIX) or w not in IMG_WIDTHS:
+    if not src.startswith(IMAGE_ALLOWED_PREFIX) or ".." in src or "\\" in src or w not in IMG_WIDTHS:
         raise HTTPException(400, "Invalid image")
     key = hashlib.sha256(f"{src}|{w}".encode()).hexdigest()
     path = IMG_CACHE / f"{key}.webp"
@@ -130,15 +134,21 @@ async def image(src: str, w: int = 1200):
                 await asyncio.sleep(0.4 * (2 ** attempt))
         if data is None:
             raise HTTPException(502, "Image unavailable")
-        im = Image.open(io.BytesIO(data))
-        im = ImageOps.exif_transpose(im)
-        im = im.convert("RGBA" if im.mode in ("RGBA", "LA", "P") else "RGB")
-        if im.width > w:
-            im = im.resize((w, round(im.height * w / im.width)), Image.LANCZOS)
-        tmp = path.with_suffix(".tmp")
-        im.save(tmp, "WEBP", quality=80, method=4)
-        tmp.replace(path)
+        try:
+            await asyncio.to_thread(render_webp, data, w, path)
+        except (UnidentifiedImageError, OSError):
+            raise HTTPException(502, "Image unavailable")
     return FileResponse(path, media_type="image/webp", headers={"Cache-Control": "public, max-age=31536000, immutable"})
+
+
+def render_webp(data: bytes, w: int, path: Path):
+    im = ImageOps.exif_transpose(Image.open(io.BytesIO(data)))
+    im = im.convert("RGBA" if im.mode in ("RGBA", "LA", "P") else "RGB")
+    if im.width > w:
+        im = im.resize((w, round(im.height * w / im.width)), Image.LANCZOS)
+    tmp = path.with_name(f"{path.stem}.{uuid.uuid4().hex}.tmp")
+    im.save(tmp, "WEBP", quality=80, method=4)
+    tmp.replace(path)
 
 
 @api_router.get("/sitemap.xml")

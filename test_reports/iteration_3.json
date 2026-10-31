@@ -1,0 +1,39 @@
+{
+  "summary": "Verified fix for 'Selected experiences laden niet'. /api/img proxy works: all 4 card images (w=800), heroes (w=1600), and the inline body image (w=1200) return 200 image/webp, resized, small (<600KB), and cached (2nd request fast). Disallowed src and invalid w return 400, missing src 422. Home #work: 4 cards render with --bg -> /api/img&w=800, all decode at 800px, no ERR_BLOCKED_BY_ORB / console errors. All 4 detail pages: hero loads 1600px, body image on 3f45... is rewritten to /api/img and loads, OVB video readyState=4, 'More work' shows 3 cards with proxied images. Regression: nav, card->detail->back, sections, footer, mobile layout OK. /api/experiences, /api/experiences/{id}, /api/sitemap.xml 200.",
+  "backend_issues": {
+    "critical": [],
+    "minor": [
+      {"endpoint": "fetch_news (server.py)", "issue": "Review request says CMS JSON fetch retries on 5xx, but fetch_news has NO retry loop - a single upstream 5xx still gives 502 -> experiences-error state on the site."},
+      {"endpoint": "/api/img", "issue": "Prefix check is a plain startswith; src like '<prefix>../other/x.jpg' passes (returned 404 from upstream instead of 400) because httpx normalizes dot-segments -> fetch escapes the koodh-clara path on the same host. Parse URL and reject '..' / normalize before checking."},
+      {"endpoint": "/api/img", "issue": "PIL decode/resize/WebP encode runs synchronously inside async handler (blocks event loop for multi-MB images); wrap in asyncio.to_thread. Non-image upstream content (UnidentifiedImageError) -> unhandled 500. Concurrent first requests for same key share the same .tmp filename -> possible FileNotFoundError on replace (use unique tmp name)."},
+      {"endpoint": "/api/img (preview only)", "issue": "Backend sets 'Cache-Control: public, max-age=31536000, immutable' (verified on :8001) but preview ingress overrides it with no-store; not an app bug."}
+    ]
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [
+      {"flow": "OVB article video", "issue": "Video still streams directly from nbg1.your-objectstorage.com (not proxied) so it remains exposed to the same intermittent 503 SlowDown; loaded fine during test.", "affected_selectors": ["[data-testid='project-body'] video"]}
+    ],
+    "design_issues": [
+      {"screen": "Home #work desktop 4-col cards", "issues": ["Title 'Nostalgie Vlaanderen/België' breaks mid-word ('Vlaanderen/B' / 'elgië') - overflow-wrap:anywhere/break-all; consider inserting <wbr> after '/' or using overflow-wrap:break-word"]}
+    ]
+  },
+  "test_report_links": ["/app/backend/tests/test_img_proxy.py", "/app/backend/tests/test_experiences.py", "/app/test_reports/pytest/pytest_results.xml"],
+  "action_items": [
+    "Implement the promised retry-on-5xx in fetch_news",
+    "Harden /api/img src validation against '..' path segments",
+    "Run PIL work in asyncio.to_thread, handle non-image content (return 502), use unique tmp filenames",
+    "Optional: fix mid-word break of 'Vlaanderen/België' card title; consider proxying/retrying video"
+  ],
+  "critical_code_review_comments": [
+    "fetch_news lacks retry despite claim",
+    "imgUrl() in api.js proxies any image_url; if CMS ever returns an image outside the allowed prefix it will 400 - consider falling back to raw src when not matching prefix",
+    "Disk cache in tempdir has no eviction (fine for 4 articles)"
+  ],
+  "updated_files": ["/app/backend/tests/test_img_proxy.py"],
+  "success_rate": {"backend": "100% (23/23)", "frontend": "100%"},
+  "seed_data_creation": "none",
+  "retest_needed": false,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "Run: export REACT_APP_BACKEND_URL=...; pytest /app/backend/tests. Cache-Control assertion accepts no-store due to preview ingress. Only article 3f4564a9 has an inline body image; 4e152384 (OVB) has the video."
+}
