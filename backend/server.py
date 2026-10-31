@@ -90,7 +90,7 @@ async def fetch_news(path: str):
         async with httpx.AsyncClient(timeout=15, follow_redirects=True) as c:
             for attempt in range(3):
                 r = await c.get(f"{NEWS_API_BASE}{path}")
-                if r.status_code not in (429, 500, 502, 503, 504):
+                if r.status_code not in (429, 500, 502, 503, 504) or attempt == 2:
                     break
                 await asyncio.sleep(0.4 * (2 ** attempt))
         if r.status_code == 404:
@@ -112,43 +112,82 @@ async def get_experience(article_id: str):
     return await fetch_news(f"/articles/{quote(article_id, safe='')}")
 
 
+IMG_TASKS: dict = {}
+
+
+def img_path(src: str, w: int) -> Path:
+    return IMG_CACHE / f"{hashlib.sha256(f'{src}|{w}'.encode()).hexdigest()}.webp"
+
+
+async def build_images(src: str):
+    data = None
+    async with httpx.AsyncClient(timeout=30, follow_redirects=True) as c:
+        for attempt in range(5):
+            try:
+                r = await c.get(src)
+                if r.status_code == 200:
+                    data = r.content
+                    break
+                if r.status_code not in (429, 500, 502, 503, 504):
+                    raise HTTPException(404, "Image not found")
+            except httpx.HTTPError:
+                pass
+            if attempt < 4:
+                await asyncio.sleep(0.4 * (2 ** attempt))
+    if data is None:
+        raise HTTPException(502, "Image unavailable")
+    try:
+        await asyncio.to_thread(render_all, data, src)
+    except (UnidentifiedImageError, OSError):
+        raise HTTPException(502, "Image unavailable")
+
+
+def ensure_images(src: str) -> asyncio.Task:
+    task = IMG_TASKS.get(src)
+    if task is None:
+        task = asyncio.create_task(build_images(src))
+        IMG_TASKS[src] = task
+        task.add_done_callback(lambda _t: IMG_TASKS.pop(src, None))
+    return task
+
+
 @api_router.get("/img")
 async def image(src: str, w: int = 1200):
     if not src.startswith(IMAGE_ALLOWED_PREFIX) or ".." in src or "\\" in src or w not in IMG_WIDTHS:
         raise HTTPException(400, "Invalid image")
-    key = hashlib.sha256(f"{src}|{w}".encode()).hexdigest()
-    path = IMG_CACHE / f"{key}.webp"
+    path = img_path(src, w)
     if not path.exists():
-        data = None
-        async with httpx.AsyncClient(timeout=30, follow_redirects=True) as c:
-            for attempt in range(5):
-                try:
-                    r = await c.get(src)
-                    if r.status_code == 200:
-                        data = r.content
-                        break
-                    if r.status_code not in (429, 500, 502, 503, 504):
-                        raise HTTPException(404, "Image not found")
-                except httpx.HTTPError:
-                    pass
-                await asyncio.sleep(0.4 * (2 ** attempt))
-        if data is None:
-            raise HTTPException(502, "Image unavailable")
         try:
-            await asyncio.to_thread(render_webp, data, w, path)
-        except (UnidentifiedImageError, OSError):
-            raise HTTPException(502, "Image unavailable")
+            await asyncio.wait_for(asyncio.shield(ensure_images(src)), timeout=45)
+        except asyncio.TimeoutError:
+            raise HTTPException(503, "Image is being prepared", headers={"Retry-After": "10"})
     return FileResponse(path, media_type="image/webp", headers={"Cache-Control": "public, max-age=31536000, immutable"})
 
 
-def render_webp(data: bytes, w: int, path: Path):
-    im = ImageOps.exif_transpose(Image.open(io.BytesIO(data)))
-    im = im.convert("RGBA" if im.mode in ("RGBA", "LA", "P") else "RGB")
-    if im.width > w:
-        im = im.resize((w, round(im.height * w / im.width)), Image.LANCZOS)
-    tmp = path.with_name(f"{path.stem}.{uuid.uuid4().hex}.tmp")
-    im.save(tmp, "WEBP", quality=80, method=4)
-    tmp.replace(path)
+def render_all(data: bytes, src: str):
+    IMG_CACHE.mkdir(parents=True, exist_ok=True)
+    base = ImageOps.exif_transpose(Image.open(io.BytesIO(data)))
+    base = base.convert("RGBA" if base.mode in ("RGBA", "LA", "P") else "RGB")
+    for w in sorted(IMG_WIDTHS, reverse=True):
+        im = base.resize((w, round(base.height * w / base.width)), Image.LANCZOS) if base.width > w else base
+        path = img_path(src, w)
+        tmp = path.with_name(f"{path.stem}.{uuid.uuid4().hex}.tmp")
+        im.save(tmp, "WEBP", quality=80, method=4)
+        tmp.replace(path)
+
+
+async def warm_images():
+    try:
+        data = await fetch_news(NEWS_SITE_PATH)
+        for a in data.get("items", []):
+            src = a.get("image_url") or ""
+            if src.startswith(IMAGE_ALLOWED_PREFIX) and not img_path(src, 800).exists():
+                try:
+                    await ensure_images(src)
+                except HTTPException:
+                    logger.warning("Could not warm image %s", src)
+    except HTTPException:
+        logger.warning("Could not warm images")
 
 
 @api_router.get("/sitemap.xml")
@@ -181,6 +220,11 @@ logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 )
 logger = logging.getLogger(__name__)
+
+@app.on_event("startup")
+async def start_warm_images():
+    app.state.warm_task = asyncio.create_task(warm_images())
+
 
 @app.on_event("shutdown")
 async def shutdown_db_client():
