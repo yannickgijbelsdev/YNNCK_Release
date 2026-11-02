@@ -19,9 +19,9 @@ export const JOBS = [
   { tone: "p", now: true, when: "Jul 2020 – now", org: "Radio GRK", logos: ["grk"], role: "Co-Technical Lead · Radio Host", text: "Unraid, Proxmox and the AXIA audio network, and how the station sounds on air. Host of Social Club on Fridays." },
   { tone: "o", when: "Sep 2023 – Oct 2024", org: "TOPradio", logos: ["topradio"], role: "Radio Imaging Producer", text: "Sweepers, beds and IDs for Dance Top 1000, TOPHit40, Allez Xander! and Dance Top 500." },
   { tone: "n", when: "May 2022 – Nov 2025", org: "Radiogroep", logos: ["radiogroep", "thomasmore"], role: "Broadcast Engineer · Web Application Developer", text: "Broadcast engineering for Nostalgie Vlaanderen and Radiobox for company radio, Thomas More, Zoo Media and Radio Roem." },
-  { tone: "p", when: "Jul 2021 – May 2024", org: "Studio Sonart", role: "vMix Operator · Radiobox Lead Developer", text: "Built Radiobox so company-radio employees could send messages and follow the live show." },
-  { tone: "o", when: "Aug 2020 – Apr 2024", org: "Telenet Group", role: "Technical Advisor · Digital Specialist", text: "Helped customers with modems, networks and fibre appointments, by phone and WhatsApp." },
-  { tone: "n", when: "May 2015 – Jul 2026", org: "Lokale Radio MFY", role: "General Lead · Technical Lead · Radio Host", text: "Eleven years at the station, from presenting Social Club to leading the technology and the station." },
+  { tone: "p", when: "Jul 2021 – May 2024", org: "Studio Sonart", logos: ["sonart"], role: "vMix Operator · Radiobox Lead Developer", text: "Built Radiobox so company-radio employees could send messages and follow the live show." },
+  { tone: "o", when: "Aug 2020 – Apr 2024", org: "Telenet Group", logos: ["telenet"], role: "Technical Advisor · Digital Specialist", text: "Helped customers with modems, networks and fibre appointments, by phone and WhatsApp." },
+  { tone: "n", when: "May 2015 – Jul 2026", org: "Lokale Radio MFY", logos: ["mfy"], role: "General Lead · Technical Lead · Radio Host", text: "Eleven years at the station, from presenting Social Club to leading the technology and the station." },
 ];
 
 export const HIGHLIGHTS = [

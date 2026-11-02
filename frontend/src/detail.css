@@ -52,3 +52,4 @@ body{font-family:var(--f)}
 .blogo.wide img{width:80%;height:64%}
 .tlogos .blogo.wide{width:56px;border-radius:14px}
 @media (max-width:900px){.blogo.wide{width:72px}}
+.blogo.fill img{width:100%;height:100%;object-fit:cover}

@@ -8,6 +8,9 @@ export const LOGOS = {
   topradio: { name: "TOPradio", bg: "#111", img: "/img/topradio.png", wide: true },
   thomasmore: { name: "Thomas More", bg: "#1F7A8C", img: "/img/thomas-more.png", wide: true },
   ovb: { name: "OVB Congres", bg: "#4B2B8F", img: "/img/ovb-congres.png", wide: true },
+  sonart: { name: "Studio Sonart", bg: "#16171C", img: "/img/studio-sonart.png", wide: true },
+  telenet: { name: "Telenet Group", bg: "#FFC421", img: "/img/telenet.png", fill: true },
+  mfy: { name: "Lokale Radio MFY", bg: "#FFFFFF", img: "/img/radio-mfy.png", wide: true },
 };
 
 const RULES = [
@@ -27,7 +30,7 @@ export const Logos = ({ ids, className = "blogos" }) =>
       {ids.map((id) => {
         const l = LOGOS[id];
         return (
-          <span key={id} className={`blogo${l.wide ? " wide" : ""}`} style={{ background: l.bg }} title={l.name} data-testid={`logo-${id}`}>
+          <span key={id} className={`blogo${l.wide ? " wide" : ""}${l.fill ? " fill" : ""}`} style={{ background: l.bg }} title={l.name} data-testid={`logo-${id}`}>
             {l.img ? <img src={l.img} alt={l.name} /> : <K />}
           </span>
         );
