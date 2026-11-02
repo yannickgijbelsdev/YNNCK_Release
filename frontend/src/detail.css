@@ -57,3 +57,6 @@ body{font-family:var(--f)}
 .blogo.xwide img{width:84%;height:auto}
 .tlogos .blogo.xwide{width:96px;border-radius:14px}
 @media (max-width:900px){.blogo.xwide{width:128px}}
+.ftop.ftop-min{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:20px}
+.ftop-min .fmail{margin-top:0}
+.fbot span:nth-child(2){display:inline}

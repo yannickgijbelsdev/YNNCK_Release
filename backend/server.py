@@ -68,7 +68,10 @@ async def fetch_news(path: str):
             raise HTTPException(404, "Not found")
         if r is not None and r.status_code == 200:
             data = r.json()
-            news_cache_file(path).write_text(json.dumps(data))
+            target = news_cache_file(path)
+            tmp = target.with_name(f"{target.stem}.{uuid.uuid4().hex}.tmp")
+            tmp.write_text(json.dumps(data))
+            tmp.replace(target)
             return data
     except ValueError:
         pass

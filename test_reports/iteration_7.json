@@ -1,0 +1,37 @@
+{
+  "summary": "Iteration 7: CMS-outage hardening. (1) Preview normal mode: #work shows 4 project-card-{id} with images. All 4 /work/{id} pages load with the hero image and 3 more-* cards. 15 logos, none broken. Nav, intro, skills, the CV timeline (cv-item-0..8), contact and footer testids are all present. No console errors and no 4xx/5xx responses. (2) Backend stale cache: I set NEWS_API_BASE to https://clr-unreachable.invalid and restarted the backend. /api/experiences, all 4 /api/experiences/{id}, /api/sitemap.xml and /api/img still return 200 from the disk cache, and the logs say 'CMS unavailable, serving cached copy'. An unknown id with no cache returns 502. Each cached response takes about 1.2s because the retry backoff runs first. I restored .env (verified byte-identical) and restarted; the unknown id is back to 404 and the list to 200. (3) Frontend fallback: I used Playwright to make every */api/experiences* request return 502. The app called https://clr.koodh.com/api/news/ynnck/homepagina and /articles/{id} directly, and the call was NOT CORS-blocked. Clara currently returns Access-Control-Allow-Origin for the preview origin (checked with curl), but not for https://ynnck.dev or arbitrary origins. So in preview the fallback succeeded: 4 cards with direct objectstorage images, and the detail page loaded with the direct hero image. When I also aborted the clara.koodh.com calls (to simulate CORS failure), experiences-error + experiences-retry appeared after about 8s with no infinite skeleton. The detail page showed project-error + project-retry. After removing the block, Retry recovered to 4 cards. Pytest: 21/21 live and 8/8 in stale mode.",
+  "backend_issues": {
+    "critical": [],
+    "minor": [
+      {"endpoint": "/api/experiences/{unknown} during CMS outage", "issue": "The backend's 502 JSON is replaced by the Cloudflare HTML 502 page at the ingress. This is harmless for the frontend, which only checks the status, but clients never see the JSON detail."},
+      {"endpoint": "fetch_news", "issue": "The cache write is not atomic (write_text). A concurrent read during a write could json.loads a partial file and return 500. Use tmp+replace as render_all does."}
+    ]
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [
+      {"flow": "Direct CMS fallback on production (ynnck.dev)", "issue": "The fallback works only where Clara sends ACAO. Clara currently allows the preview origin but not https://ynnck.dev, so on production the direct call will be CORS-blocked and users will see the error box. Clara must whitelist https://ynnck.dev (and www) for the fallback to help in production.", "affected_selectors": ["experiences-error"]}
+    ],
+    "design_issues": [
+      {"screen": "Project detail error state", "issues": ["The 'Try again' (project-retry) button uses a left/back arrow icon, which reads as 'go back' rather than 'retry'"]}
+    ]
+  },
+  "test_report_links": ["/app/backend/tests/test_iter7_stale_cache.py", "/app/test_reports/pytest/pytest_iter7_live.xml", "/app/test_reports/pytest/pytest_iter7_stale.xml"],
+  "action_items": [
+    "Ask the Clara CMS owner to add https://ynnck.dev (and https://www.ynnck.dev) to allowed CORS origins; otherwise the frontend fallback cannot work on production",
+    "The production root cause is still the user's self-hosted backend (nginx 502) and an old bundle; the user must redeploy/start the backend",
+    "Optional: make the news cache write atomic (tmp file + replace)",
+    "Optional: the module-level `direct` flag in lib/api.js is sticky. After one fallback, all images in the session bypass /api/img even after the backend recovers, and mixed states are possible (cards rendered before the flag flips keep /api/img URLs). Acceptable, but consider deriving the image mode per response."
+  ],
+  "critical_code_review_comments": [
+    "lib/api.js: the worst case is a backend timeout of 20s plus a CMS timeout of 20s, about 40s of skeleton per react-query attempt, multiplied by the default retries (3). A hanging backend could show a skeleton for minutes. Consider a shorter backend timeout (e.g. 8s).",
+    "fetch_news: during an outage every request pays about 1.2s of retry backoff before the cache is served. Consider a short circuit-breaker (skip CMS for N seconds after a failure).",
+    "fetch_news: 4xx other than 404 (401/403) falls through to the stale cache. This is probably intended but silently masks misconfiguration; it is logged only as a warning."
+  ],
+  "updated_files": ["/app/backend/tests/test_iter7_stale_cache.py (new)"],
+  "success_rate": {"backend": "100% (21/21 live, 8/8 stale)", "frontend": "100% of requested checks"},
+  "seed_data_creation": "none",
+  "retest_needed": false,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "Run test_iter7_stale_cache.py with STALE_MODE=1 only while NEWS_API_BASE points to an unreachable host (backup .env first, restore after). The backend .env was restored to NEWS_API_BASE=\"https://clr.koodh.com/api/news\". Clara ACAO: allowed for the preview origin, absent for ynnck.dev. To simulate CORS failure in Playwright, abort https://clr.koodh.com/** too. Production ynnck.dev was not tested."
+}

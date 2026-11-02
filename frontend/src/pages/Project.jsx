@@ -1,6 +1,7 @@
 import { useEffect, useMemo } from "react";
 import { Link, useParams } from "react-router-dom";
 import DOMPurify from "dompurify";
+import { RotateCw } from "lucide-react";
 import { Right, SectionPanel } from "@/components/Bits";
 import { ExperienceCards } from "@/components/ExperienceCards";
 import { useReveal } from "@/hooks/useReveal";
@@ -63,7 +64,7 @@ export default function Project() {
     return (
       <main id="top" data-testid="project-error">
         <SectionPanel id="project" label="Experiences" lines={["Hmm."]} ask="This experience couldn’t be loaded right now." solo>
-          <button className="pback pretry" onClick={() => a.refetch()} data-testid="project-retry"><span><Right /></span> Try again</button>
+          <button className="pback pretry" onClick={() => a.refetch()} data-testid="project-retry"><span><RotateCw size={14} /></span> Try again</button>
         </SectionPanel>
       </main>
     );
