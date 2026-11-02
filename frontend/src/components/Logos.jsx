@@ -10,7 +10,7 @@ export const LOGOS = {
   ovb: { name: "OVB Congres", bg: "#4B2B8F", img: "/img/ovb-congres.png", wide: true },
   sonart: { name: "Studio Sonart", bg: "#16171C", img: "/img/studio-sonart.png", wide: true },
   telenet: { name: "Telenet Group", bg: "#FFC421", img: "/img/telenet.png", fill: true },
-  mfy: { name: "Lokale Radio MFY", bg: "#FFFFFF", img: "/img/radio-mfy.png", wide: true },
+  mfy: { name: "Lokale Radio MFY", bg: "#5C2273", img: "/img/radio-mfy.png", fill: true },
 };
 
 const RULES = [
