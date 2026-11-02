@@ -9,13 +9,13 @@ export const INTRO = [
 export const SKILLS = [
   { tone: "p", pt: 8, small: "Development & AI", logos: ["koodh", "radiogroep"], title: "Websites & AI", text: "Websites, web apps like Radiobox and AI that takes routine work off people’s hands.", href: "https://koodh.com" },
   { tone: "o", pt: 9, small: "Broadcast & audio", logos: ["topradio", "grk"], title: "Radio", text: "AXIA networks, Unraid and Proxmox servers, vMix and radio imaging for TOPradio.", href: "#cv" },
-  { tone: "n", pt: 10, small: "IT support", title: "Microsoft 365", text: "B2B support at Autosoft by phone and ticket, focused on Microsoft 365 and CodeTwo.", href: "#cv" },
+  { tone: "n", pt: 10, small: "IT support", logos: ["autosoft"], title: "Microsoft 365", text: "B2B support at Autosoft by phone and ticket, focused on Microsoft 365 and CodeTwo.", href: "#cv" },
 ];
 
 export const JOBS = [
   { tone: "p", now: true, when: "May 2026 – now", org: "Koodh", logos: ["koodh"], role: "Co-Founder", text: "IT solutions for businesses and individuals: signatures, Microsoft 365, consulting, websites, AI and custom web systems." },
   { tone: "o", now: true, when: "May 2026 – now", org: "Koodh Media Group", logos: ["kmg"], role: "Founder", text: "Event photography and audio imaging for a range of companies." },
-  { tone: "n", now: true, when: "Sep 2024 – now", org: "Autosoft IT Solutions", role: "IT Support Specialist B2B", text: "First-line support for business customers, focused on Microsoft 365 and CodeTwo. Earlier technician B2C and RMA specialist." },
+  { tone: "n", now: true, when: "Sep 2024 – now", org: "Autosoft IT Solutions", logos: ["autosoft"], role: "IT Support Specialist B2B", text: "First-line support for business customers, focused on Microsoft 365 and CodeTwo. Earlier technician B2C and RMA specialist." },
   { tone: "p", now: true, when: "Jul 2020 – now", org: "Radio GRK", logos: ["grk"], role: "Co-Technical Lead · Radio Host", text: "Unraid, Proxmox and the AXIA audio network, and how the station sounds on air. Host of Social Club on Fridays." },
   { tone: "o", when: "Sep 2023 – Oct 2024", org: "TOPradio", logos: ["topradio"], role: "Radio Imaging Producer", text: "Sweepers, beds and IDs for Dance Top 1000, TOPHit40, Allez Xander! and Dance Top 500." },
   { tone: "n", when: "May 2022 – Nov 2025", org: "Radiogroep", logos: ["radiogroep", "thomasmore"], role: "Broadcast Engineer · Web Application Developer", text: "Broadcast engineering for Nostalgie Vlaanderen and Radiobox for company radio, Thomas More, Zoo Media and Radio Roem." },
