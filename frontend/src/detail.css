@@ -53,3 +53,7 @@ body{font-family:var(--f)}
 .tlogos .blogo.wide{width:56px;border-radius:14px}
 @media (max-width:900px){.blogo.wide{width:72px}}
 .blogo.fill img{width:100%;height:100%;object-fit:cover}
+.blogo.xwide{width:150px;border-radius:22px}
+.blogo.xwide img{width:84%;height:auto}
+.tlogos .blogo.xwide{width:96px;border-radius:14px}
+@media (max-width:900px){.blogo.xwide{width:128px}}

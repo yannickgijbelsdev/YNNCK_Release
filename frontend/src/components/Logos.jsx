@@ -10,7 +10,7 @@ export const LOGOS = {
   ovb: { name: "OVB Congres", bg: "#4B2B8F", img: "/img/ovb-congres.png", wide: true },
   sonart: { name: "Studio Sonart", bg: "#16171C", img: "/img/studio-sonart.png", wide: true },
   telenet: { name: "Telenet Group", bg: "#FFC421", img: "/img/telenet.png", fill: true },
-  autosoft: { name: "Autosoft IT Solutions, Lommel", bg: "#00A0E0", img: "/img/autosoft.png", fill: true },
+  autosoft: { name: "Autosoft IT Solutions, Lommel", bg: "#0F1424", img: "/img/autosoft.png", xwide: true },
   mfy: { name: "Lokale Radio MFY", bg: "#5C2273", img: "/img/radio-mfy.png", fill: true },
 };
 
@@ -31,7 +31,7 @@ export const Logos = ({ ids, className = "blogos" }) =>
       {ids.map((id) => {
         const l = LOGOS[id];
         return (
-          <span key={id} className={`blogo${l.wide ? " wide" : ""}${l.fill ? " fill" : ""}`} style={{ background: l.bg }} title={l.name} data-testid={`logo-${id}`}>
+          <span key={id} className={`blogo${l.wide ? " wide" : ""}${l.fill ? " fill" : ""}${l.xwide ? " xwide" : ""}`} style={{ background: l.bg }} title={l.name} data-testid={`logo-${id}`}>
             {l.img ? <img src={l.img} alt={l.name} /> : <K />}
           </span>
         );
