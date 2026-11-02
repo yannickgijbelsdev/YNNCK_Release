@@ -60,7 +60,7 @@ export default function Home() {
       <SectionPanel id="skills" label="What I do" lines={["Code, cloud", "and sound."]} ask="Most of my work sits where IT and media meet."
         cards={cards(SKILLS, "c3", "skill-card")} />
       <SectionPanel id="cv" label="Curriculum vitae" lines={["Experience."]} tall wide cards={cards(HIGHLIGHTS, "", "highlight-card")}>
-        <p className="ask">From radio host in 2015 to co-founding Koodh. Scroll through the years. <a href="https://ynnck.dev/cv" data-testid="full-cv-link">Full CV →</a></p>
+        <p className="ask">From radio host in 2015 to co-founding Koodh. Scroll through the years.</p>
         <Timeline />
       </SectionPanel>
       <SectionPanel id="contact" label="Contact" lines={["Let’s talk."]} ask="Got a project or an idea in mind? Drop me a line. A real person, no ticket numbers."
