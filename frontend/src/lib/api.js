@@ -1,5 +1,6 @@
 import axios from "axios";
 import { useQuery } from "@tanstack/react-query";
+import { logosFor } from "@/components/Logos";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 const TONES = ["p", "o", "n", "k"];
@@ -20,6 +21,7 @@ export const toCard = (a, i) => ({
   pt: 4 + (i % 4),
   small: tagName(a.tags?.[0]) || "Experience",
   title: a.title,
+  logos: logosFor(a.title),
   text: a.excerpt,
   img: imgUrl(a.image_url, 800),
   to: `/work/${a.id}`,

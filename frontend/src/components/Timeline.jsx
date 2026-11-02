@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import { JOBS } from "@/data/site";
+import { Logos } from "@/components/Logos";
 
 export const Timeline = () => {
   const ref = useRef(null), fill = useRef(null);
@@ -30,7 +31,7 @@ export const Timeline = () => {
           <span className="node" />
           <div className="tc">
             <span className="when">{j.when}{j.now && <> · <b>Current</b></>}</span>
-            <h4>{j.org}</h4>
+            <h4><Logos ids={j.logos} className="tlogos" />{j.org}</h4>
             <b className="jrole">{j.role}</b>
             <p>{j.text}</p>
           </div>

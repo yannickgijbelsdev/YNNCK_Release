@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { mountYnnck } from "@/lib/ynnckLogo";
+import { Logos } from "@/components/Logos";
 
 export const UpRight = () => (
   <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 10L10 4M5 4h5v5" /></svg>
@@ -38,6 +39,7 @@ export const Card = ({ c, testid }) => {
   const inner = (
     <>
       <i className={`pt pt${c.pt}`} aria-hidden="true" />
+      <Logos ids={c.logos} />
       <small>{c.small}</small>
       <h3>{typeof c.title === "string" ? c.title.split(/(?<=\/)/).map((t, i) => <span key={i}>{i > 0 && <wbr />}{t}</span>) : c.title}</h3>
       {c.text && <p>{c.text}</p>}

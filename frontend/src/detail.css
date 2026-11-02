@@ -35,3 +35,16 @@ body{font-family:var(--f)}
 .exp-msg button:hover{background:var(--orange)}
 @media (max-width:900px){.pdetail{padding-inline:14px}.exp-msg{margin:-36px 10px 0}}
 .pretry{border:0;background:none;cursor:pointer;font-family:var(--f);padding:0}
+.c3 .blogos{position:absolute;left:24px;top:24px;display:flex;z-index:2}
+.blogo{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;overflow:hidden;box-shadow:0 0 0 3px rgba(255,255,255,.9);margin-left:-10px;transition:transform .35s cubic-bezier(.34,1.56,.64,1),margin .4s cubic-bezier(.34,1.56,.64,1)}
+.blogos .blogo:first-child{margin-left:0}
+.c3:hover .blogo{margin-left:4px}.c3:hover .blogo:first-child{margin-left:0}
+.blogo img{width:72%;height:72%;object-fit:contain}
+.blogo svg{width:13px;height:auto}.blogo svg polygon{fill:#fff}
+.tlogos{display:inline-flex;vertical-align:middle;margin-right:10px}
+.tlogos .blogo{width:28px;height:28px;margin-left:-7px;box-shadow:0 0 0 2px #fff}
+.tlogos .blogo:first-child{margin-left:0}
+.tlogos .blogo svg{width:9px}
+.ti:nth-of-type(odd) .tc h4{display:flex;align-items:center;justify-content:flex-end}
+.ti:nth-of-type(even) .tc h4{display:flex;align-items:center}
+@media (max-width:900px){.c3 .blogos{position:static;margin-bottom:10px}.blogo{width:36px;height:36px}.blogo svg{width:11px}.ti .tc h4{justify-content:flex-start!important}}

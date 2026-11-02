@@ -6,9 +6,8 @@ import { useReveal } from "@/hooks/useReveal";
 import { useMeta } from "@/hooks/useMeta";
 import { ExperienceCards } from "@/components/ExperienceCards";
 import { useExperiences } from "@/lib/api";
-import { DOTS, EMAIL, HIGHLIGHTS, INTRO, SKILLS, STEPS } from "@/data/site";
+import { EMAIL, HIGHLIGHTS, INTRO, SKILLS, STEPS } from "@/data/site";
 
-const K = () => <svg viewBox="66 26 42 51"><polygon points="91.95,30.476 98.589,30.476 77.733,47.939 102.696,72.502 96.441,72.502 71.467,47.939" /></svg>;
 const slug = (s) => s.toLowerCase().replace(/[^a-z0-9]+/g, "-");
 
 const Hero = () => {
@@ -25,13 +24,6 @@ const Hero = () => {
         <div className="ptxt">
           <h1 data-testid="hero-title"><span className="sr-only">Yannick Gijbels: developer, broadcast engineer and radio imaging producer from Pelt, Belgium. </span><span className="w" style={{ "--d": 0 }} aria-hidden="true">Building</span><br /><span className="w" style={{ "--d": 1 }} aria-hidden="true">stories.</span></h1>
           <p className="ask w" style={{ "--d": 3 }}>What can I help you with?</p>
-          <div className="dots" aria-label="Worked with" data-testid="hero-logos">
-            {DOTS.map((d, i) => (
-              <span key={d.title} style={{ "--i": i }} title={d.title} className={d.cls} data-testid={`hero-logo-${slug(d.title)}`}>
-                {d.svg ? <K /> : <img src={d.img} alt={d.title} />}
-              </span>
-            ))}
-          </div>
         </div>
         <div className="pimg"><img ref={pim} src="/img/portrait.webp" alt="Portrait of Yannick Gijbels, developer and broadcast engineer from Pelt" width="752" height="781" fetchPriority="high" data-testid="hero-portrait" /></div>
       </div>
