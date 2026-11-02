@@ -1,0 +1,28 @@
+{
+  "summary": "Iteration 6: logo relocation and backend simplification. The hero has no [data-testid=hero-logos]; the logo row under 'What can I help you with?' is gone. Every logo mapping matches the spec. Intro: KMG->kmg, On air->grk, Koodh->koodh. Skills: Websites & AI->koodh+radiogroep, Radio->topradio+grk, Microsoft 365->none. Work cards: OVB->ovb, Koodh/KMG->koodh+kmg, 127->none, Nostalgie->radiogroep. More-work cards on the detail pages (checked on 2 pages) use the same mapping. CV timeline: Koodh, KMG, Radio GRK, TOPradio and Radiogroep (radiogroep+thomasmore) have logos; Autosoft, Studio Sonart, Telenet and MFY have none. All logo images load (none broken). Mobile 390px: no horizontal overflow (scrollWidth 390) and timeline h4 headings are one line with no overflow. Backend: /api/health returns {status:ok}, /api/status returns 404 (removed, as intended), and /api/experiences, every /api/experiences/{id}, /api/img and /api/sitemap.xml return 200. Pytest: 28/28 passed (new test_iter6_health.py plus test_experiences.py and test_img_proxy.py). No console errors and no 4xx/5xx responses.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [
+      {"component": "Skills section wrapper", "issue": "The skills cards container has class 'cards3 c3 rv', and 'c3' is also the card class. So card-scoped rules such as '.c3:hover .blogo{margin-left:4px}' also match the wrapper: hovering anywhere in the skills grid spreads the logo stacks in all 3 cards at once instead of only the hovered card. It also matches a querySelectorAll('.c3') as a pseudo-card.", "selector": ".cards3.c3", "priority": "LOW"}
+    ],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "Card logo badges", "issues": ["The OVB Congres and Radiogroep logos are wordmarks; at 44px (28px in the CV) the text is unreadable. Consider an icon or monogram variant or a larger badge.", "The TOPradio logo looks slightly cropped inside the round badge"]}
+    ]
+  },
+  "test_report_links": ["/app/backend/tests/test_iter6_health.py", "/app/backend/tests/test_experiences.py", "/app/backend/tests/test_img_proxy.py", "/app/test_reports/pytest/pytest_iter6.xml"],
+  "action_items": [
+    "Optional: rename the 'c3' class on the skills wrapper (.cards3.c3) so card hover rules apply per card",
+    "Optional: improve legibility of the wordmark logos (OVB, Radiogroep) in the small badges"
+  ],
+  "critical_code_review_comments": [
+    "logosFor uses ordered regex RULES on the article title. This is fragile if CMS titles change (e.g. a title containing both 'koodh' and 'radio' takes the first match). Acceptable for now; could use CMS tags instead.",
+    "server.py: CORS allow_credentials=True with a '*' origin default; fine for a public read-only API, but set CORS_ORIGINS in production"
+  ],
+  "updated_files": ["/app/backend/tests/test_iter6_health.py (new)"],
+  "success_rate": {"backend": "100% (28/28)", "frontend": "100% of requested checks"},
+  "seed_data_creation": "none",
+  "retest_needed": false,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "Logo testids are logo-{id}. Work card ids: OVB 4e152384, Koodh dcb6fd81, 127 d965477d, Nostalgie 3f4564a9. I did not run the destructive iter4/iter5 suites this round, to keep the img cache warm. Production ynnck.dev was not tested."
+}

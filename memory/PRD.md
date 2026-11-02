@@ -33,6 +33,10 @@
 - Fix: /api/img proxy (allowlisted bucket via IMAGE_ALLOWED_PREFIX): retries, one download per image, renders WebP at 480/800/1200/1600, disk cache, 45s client cap with background completion, startup pre-warm of hero + body images. CMS JSON fetch retries on 5xx.
 - Cards, detail hero, body images and OG image use the proxy. Tested (iterations 3–5) 100%.
 
+## Iteration 6 (2026-11)
+- Hero logo row removed; brand logos now in the relevant tiles (intro, skills, CMS project cards via title match, CV timeline). Wordmarks in pill badges.
+- Production ynnck.dev is self-hosted (nginx); /api returns 502 there = backend not running. Backend simplified (Mongo removed), /api/health added, DEPLOY.md with self-host steps.
+
 ## Backlog
 - Video in articles still loads directly from object storage.
 - Client-side retry for images on 503.

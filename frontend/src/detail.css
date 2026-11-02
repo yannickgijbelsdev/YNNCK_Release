@@ -38,7 +38,7 @@ body{font-family:var(--f)}
 .c3 .blogos{position:absolute;left:24px;top:24px;display:flex;z-index:2}
 .blogo{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;overflow:hidden;box-shadow:0 0 0 3px rgba(255,255,255,.9);margin-left:-10px;transition:transform .35s cubic-bezier(.34,1.56,.64,1),margin .4s cubic-bezier(.34,1.56,.64,1)}
 .blogos .blogo:first-child{margin-left:0}
-.c3:hover .blogo{margin-left:4px}.c3:hover .blogo:first-child{margin-left:0}
+.c3:hover > .blogos .blogo{margin-left:4px}.c3:hover > .blogos .blogo:first-child{margin-left:0}
 .blogo img{width:72%;height:72%;object-fit:contain}
 .blogo svg{width:13px;height:auto}.blogo svg polygon{fill:#fff}
 .tlogos{display:inline-flex;vertical-align:middle;margin-right:10px}
@@ -48,3 +48,7 @@ body{font-family:var(--f)}
 .ti:nth-of-type(odd) .tc h4{display:flex;align-items:center;justify-content:flex-end}
 .ti:nth-of-type(even) .tc h4{display:flex;align-items:center}
 @media (max-width:900px){.c3 .blogos{position:static;margin-bottom:10px}.blogo{width:36px;height:36px}.blogo svg{width:11px}.ti .tc h4{justify-content:flex-start!important}}
+.blogo.wide{width:84px;border-radius:22px}
+.blogo.wide img{width:80%;height:64%}
+.tlogos .blogo.wide{width:56px;border-radius:14px}
+@media (max-width:900px){.blogo.wide{width:72px}}
