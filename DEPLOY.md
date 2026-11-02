@@ -60,7 +60,11 @@ journalctl -u ynnck-api -f
 ```
 REACT_APP_BACKEND_URL=https://ynnck.dev
 REACT_APP_SITE_URL=https://ynnck.dev
+REACT_APP_NEWS_API_BASE=https://clr.koodh.com/api/news
+REACT_APP_NEWS_SITE_PATH=/ynnck/homepagina
 ```
+
+If the backend cannot be reached, the frontend reads Clara directly. For that, Clara must allow the origin `https://ynnck.dev` (CORS: `Access-Control-Allow-Origin`). The backend also keeps the last good Clara response and serves it when Clara is briefly down.
 
 ```bash
 cd frontend && yarn install && yarn build   # upload build/ to the web root

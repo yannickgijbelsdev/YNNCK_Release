@@ -4,6 +4,7 @@ from PIL import Image, ImageOps, UnidentifiedImageError
 import asyncio
 import hashlib
 import io
+import json
 import re
 import tempfile
 from xml.sax.saxutils import escape as xml_escape
@@ -42,21 +43,40 @@ IMG_CACHE = Path(tempfile.gettempdir()) / "ynnck-img"
 IMG_CACHE.mkdir(exist_ok=True)
 
 
+NEWS_CACHE = Path(tempfile.gettempdir()) / "ynnck-news"
+NEWS_CACHE.mkdir(exist_ok=True)
+
+
+def news_cache_file(path: str) -> Path:
+    return NEWS_CACHE / f"{hashlib.sha256(path.encode()).hexdigest()}.json"
+
+
 async def fetch_news(path: str):
+    r = None
     try:
         async with httpx.AsyncClient(timeout=15, follow_redirects=True) as c:
             for attempt in range(3):
-                r = await c.get(f"{NEWS_API_BASE}{path}")
-                if r.status_code not in (429, 500, 502, 503, 504) or attempt == 2:
-                    break
-                await asyncio.sleep(0.4 * (2 ** attempt))
-        if r.status_code == 404:
+                try:
+                    r = await c.get(f"{NEWS_API_BASE}{path}")
+                    if r.status_code not in (429, 500, 502, 503, 504):
+                        break
+                except httpx.HTTPError:
+                    r = None
+                if attempt < 2:
+                    await asyncio.sleep(0.4 * (2 ** attempt))
+        if r is not None and r.status_code == 404:
             raise HTTPException(404, "Not found")
-        if r.status_code != 200:
-            raise HTTPException(502, "News service unavailable")
-        return r.json()
-    except (httpx.HTTPError, ValueError):
-        raise HTTPException(502, "News service unavailable")
+        if r is not None and r.status_code == 200:
+            data = r.json()
+            news_cache_file(path).write_text(json.dumps(data))
+            return data
+    except ValueError:
+        pass
+    cached = news_cache_file(path)
+    if cached.exists():
+        logger.warning("CMS unavailable, serving cached copy for %s", path)
+        return json.loads(cached.read_text())
+    raise HTTPException(502, "News service unavailable")
 
 
 @api_router.get("/experiences")
